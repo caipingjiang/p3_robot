@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+
+<!--
+ROS2 (Humble) gazebo 插件配置：Pioneer 3DX
+- 差速驱动：gazebo_ros_diff_drive（发布 odom->base_link，订阅 /cmd_vel）
+- 激光雷达：gazebo_ros_ray_sensor（发布 /scan，frame lms100）
+注意：不用 ${ns} 这类 xacro property（旧配置因此报 "name 'ns' is not defined"）。
+-->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- 差速驱动 -->
+  <gazebo>
+    <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+      <update_rate>100</update_rate>
+      <left_joint>base_left_wheel_joint</left_joint>
+      <right_joint>base_right_wheel_joint</right_joint>
+      <wheel_separation>0.39</wheel_separation>
+      <wheel_diameter>0.15</wheel_diameter>
+      <max_wheel_torque>5</max_wheel_torque>
+      <max_wheel_acceleration>1.0</max_wheel_acceleration>
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+      <publish_wheel_tf>false</publish_wheel_tf>
+      <odometry_frame>odom</odometry_frame>
+      <robot_base_frame>base_link</robot_base_frame>
+    </plugin>
+  </gazebo>
+
+  <!-- 激光雷达 lms100 -->
+  <gazebo reference="lms100">
+    <sensor type="ray" name="hokuyo_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>50</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.570796</min_angle>
+            <max_angle>1.570796</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.10</min>
+          <max>30.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="hokuyo_controller" filename="libgazebo_ros_ray_sensor.so">
+        <ros>
+          <remapping>~/out:=scan</remapping>
+        </ros>
+        <output_type>sensor_msgs/LaserScan</output_type>
+        <frame_name>lms100</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- 材质 -->
+  <gazebo reference="base_link">
+    <material>Gazebo/Red</material>
+  </gazebo>
+  <gazebo reference="top_plate">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="swivel">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+  <gazebo reference="center_hubcap">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+  <gazebo reference="center_wheel">
+    <material>Gazebo/Black</material>
+    <mu1>10.0</mu1>
+    <mu2>10.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+  <gazebo reference="front_sonar">
+    <material>Gazebo/Yellow</material>
+  </gazebo>
+
+</robot>
