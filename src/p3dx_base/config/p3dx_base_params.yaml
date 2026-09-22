@@ -1,0 +1,10 @@
+p3dx_base_node:
+  ros__parameters:
+    port: "/dev/p3dx"        # 底盘串口（配好 udev 规则后固定为 /dev/p3dx）
+    baud: 9600
+    enable_motors: true      # 连接后是否使能电机
+    max_v_mms: 500           # 最大平移速度 mm/s（底盘 FLASH 上限以内）
+    max_w_degs: 60           # 最大旋转速度 deg/s
+    track_width_mm: 330.0    # 轮距 mm（只影响 /odom 的角速度估算，不影响位置）
+    odom_frame: "odom"
+    base_frame: "base_link"

@@ -1,0 +1,9 @@
+# P3DX 底盘串口（Prolific PL2303，idVendor=067b idProduct=2303）固定为 /dev/p3dx
+# 解决 USB 转串口设备号在 ttyUSB0/ttyUSB1 之间漂移的问题
+#
+# 安装：
+#   sudo cp 99-p3dx.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+# 之后底盘串口固定可用 /dev/p3dx 访问，无需再猜 ttyUSB0/ttyUSB1。
+
+SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", SYMLINK+="p3dx", MODE="0666"
