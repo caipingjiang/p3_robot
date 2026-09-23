@@ -47,11 +47,16 @@ def calc_checksum(body: bytes) -> int:
 
 
 def build_command(cmd: int, arg: int | None = None) -> bytes:
-    """组装一条客户端命令包（整数参数 2 字节小端，checksum 2 字节大端）。"""
+    """组装一条客户端命令包（整数参数 2 字节小端，checksum 2 字节大端）。
+
+    负数按 ARCOS 的 sign-magnitude 编码：类型字节 0x1B + 绝对值。
+    不能存二补码——固件读到 0x1B 会把值取负，二补码取负后溢出翻转成正数，
+    导致后退/右转全部变成前进/左转（详见 p3dx-serial-probe selftest）。
+    """
     body = bytearray([cmd])
     if arg is not None:
         body.append(ARG_INT if arg >= 0 else ARG_SINT)
-        body += struct.pack("<H", arg & 0xFFFF)
+        body += struct.pack("<H", abs(arg))
     count = len(body) + 2
     return HEADER + bytes([count]) + bytes(body) + struct.pack(">H", calc_checksum(bytes(body)))
 

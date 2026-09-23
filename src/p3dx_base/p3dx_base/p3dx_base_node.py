@@ -25,7 +25,7 @@ from tf2_ros import TransformBroadcaster
 
 from p3dx_base.p3dx_driver import P3dxDriver
 
-WATCHDOG_PERIOD = 2.0   # 秒，须 < 底盘看门狗默认 2s
+WATCHDOG_PERIOD = 1.0   # 秒，须 < 底盘看门狗默认 2s（留足余量，避免脉冲间隔≥2s 触发停车）
 
 
 class P3dxBaseNode(Node):

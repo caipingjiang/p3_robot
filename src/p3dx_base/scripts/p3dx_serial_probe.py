@@ -80,7 +80,7 @@ def build_command(cmd: int, arg: int | None = None) -> bytes:
     body = bytearray([cmd])
     if arg is not None:
         body.append(ARG_INT if arg >= 0 else ARG_SINT)
-        body += struct.pack("<H", arg & 0xFFFF)   # 小端，负数转无符号存储
+        body += struct.pack("<H", abs(arg))   # 负数存绝对值（sign-magnitude），非二补码
     count = len(body) + 2                          # + 2 字节 checksum
     checksum = calc_checksum(bytes(body))
     return HEADER + bytes([count]) + bytes(body) + struct.pack(">H", checksum)
@@ -214,9 +214,9 @@ def selftest():
         ("SETV #6 arg=500", build_command(SETV, 500), None),
         ("SETRV #10 arg=60", build_command(SETRV, 60), None),
         ("SETA #5 arg=300", build_command(SETA, 300), None),
-        ("VEL #11 arg=+300", build_command(VEL, 300), None),
-        ("VEL #11 arg=-300", build_command(VEL, -300), None),
-        ("RVEL #21 arg=-60", build_command(RVEL, -60), None),
+        ("VEL #11 arg=+300", build_command(VEL, 300), b"\xfa\xfb\x06\x0b\x3b\x2c\x01\x37\x3c"),
+        ("VEL #11 arg=-300", build_command(VEL, -300), b"\xfa\xfb\x06\x0b\x1b\x2c\x01\x37\x1c"),
+        ("RVEL #21 arg=-60", build_command(RVEL, -60), b"\xfa\xfb\x06\x15\x1b\x3c\x00\x51\x1b"),
         ("STOP #29", build_command(STOP), None),
     ]
     ok = True
