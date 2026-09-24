@@ -1,9 +1,15 @@
-# P3DX 底盘串口（Prolific PL2303，idVendor=067b idProduct=2303）固定为 /dev/p3dx
-# 解决 USB 转串口设备号在 ttyUSB0/ttyUSB1 之间漂移的问题
+# Pioneer 3DX 底盘 USB 转串口（Prolific PL2303）固定为 /dev/p3dx
 #
-# 安装：
-#   sudo cp 99-p3dx.rules /etc/udev/rules.d/
-#   sudo udevadm control --reload-rules && sudo udevadm trigger
-# 之后底盘串口固定可用 /dev/p3dx 访问，无需再猜 ttyUSB0/ttyUSB1。
+# 底盘通过一颗 Prolific PL2303（idVendor=067b, idProduct=2303）USB 转串口接入，
+# 它没有唯一序列号，故用 vendor+product 匹配（本机底盘是唯一 PL2303 设备）。
+#
+# 安装（需要 root，会提示输入密码）：
+#   sudo cp ~/p3_ws/src/p3dx_base/udev/99-p3dx.rules /etc/udev/rules.d/99-p3dx.rules
+#   sudo udevadm control --reload-rules
+#   sudo udevadm trigger
+#   验证：ls -l /dev/p3dx   （应显示 /dev/p3dx -> ttyUSB0）
+#
+# 之后即可直接用：ros2 launch p3dx_slam real_slam.launch.py
+# 不再需要 base_port:=/dev/ttyUSB0 覆盖，也不再受串口号漂移影响。
 
-SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", SYMLINK+="p3dx", MODE="0666"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", MODE="0666", SYMLINK+="p3dx"
