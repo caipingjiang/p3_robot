@@ -1,0 +1,28 @@
+# Xbox 无线手柄 -> /cmd_vel 映射（P3DX 实机遥控）
+# 左摇杆：Y 轴 = 前进/后退，X 轴 = 左转/右转
+# 安全使能：按住 LB 才响应摇杆，松手即停；按住 RB 用 turbo 速度
+
+joy_node:
+  ros__parameters:
+    device_id: 0            # 手柄 SDL 设备索引（默认 0，单手柄即可用；被键盘等抢号时用 launch 参数 joy_dev:=N 覆盖）
+    # device_name: ""       # 可选：改成具体设备名可按名匹配（比索引稳，但只对特定手柄有效）
+    deadzone: 0.1           # 摇杆中心死区（归一化 [-1,1]），滤漂移噪声
+    autorepeat_rate: 20.0   # 无事件时按此频率重发，保证 /joy 稳定出数
+    coalesce_interval_ms: 1
+
+teleop_twist_joy_node:
+  ros__parameters:
+    axis_linear:            # 左摇杆垂直轴
+      x: 1
+    scale_linear:
+      x: 0.5                # 最大前进/后退速度 m/s（=底盘 max_v 500 mm/s）
+    scale_linear_turbo:
+      x: 0.8                # 按住 RB 时的最大速度 m/s
+
+    axis_angular:           # 左摇杆水平轴
+      yaw: 0
+    scale_angular:
+      yaw: 0.6              # 最大转向速度 rad/s（约 34°/s，底盘 max_w 60°/s 以内）
+
+    enable_button: 6        # 使能键：按住才发布速度。北通手柄 LB=6；标准 Xbox 手柄应改回 4
+    enable_turbo_button: 7  # turbo 键：北通手柄 RB=7（LB=6 相邻肩键）；标准 Xbox 应改回 5
