@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="willowgarage">
+    <!-- 环境光（mesh 场景较暗，补一档方向光） -->
+    <light name="world_light" type="directional">
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.6 0.6 0.6 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>0.3 -0.5 -1</direction>
+    </light>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://willowgarage</uri>
+    </include>
+  </world>
+</sdf>

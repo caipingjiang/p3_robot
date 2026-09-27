@@ -3,13 +3,20 @@ import yaml
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
     p3dx_slam_dir = get_package_share_directory('p3dx_slam')
+
+    declare_world = DeclareLaunchArgument(
+        'world',
+        default_value=os.path.join(p3dx_slam_dir, 'worlds', 'p3dx_world.world'),
+        description='仿真 world 文件路径')
+    world_path = LaunchConfiguration('world')
 
     rviz_path = os.path.join(p3dx_slam_dir, 'config', 'rviz_slam.rviz')
     slam_params_path = os.path.join(p3dx_slam_dir, 'config', 'slam_toolbox_params.yaml')
@@ -19,6 +26,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(p3dx_slam_dir, 'launch', 'bringup.launch.py')
         ),
+        launch_arguments={'world': world_path}.items(),
     )
 
     # 2. slam_toolbox（online sync）
@@ -41,6 +49,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        declare_world,
         bringup,
         slam_toolbox,
         rviz,

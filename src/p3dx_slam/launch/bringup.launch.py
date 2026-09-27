@@ -2,9 +2,9 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, SetEnvironmentVariable
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command
+from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -14,16 +14,21 @@ def generate_launch_description():
     p3dx_desc_dir = get_package_share_directory('p3dx_description_ros')
     gazebo_ros_dir = get_package_share_directory('gazebo_ros')
 
-    world_path = os.path.join(p3dx_slam_dir, 'worlds', 'p3dx_world.world')
+    declare_world = DeclareLaunchArgument(
+        'world',
+        default_value=os.path.join(p3dx_slam_dir, 'worlds', 'p3dx_world.world'),
+        description='仿真 world 文件路径（默认 p3dx_world；可传 complex_rooms / obstacle_field 绝对路径）')
+    world_path = LaunchConfiguration('world')
     xacro_path = os.path.join(p3dx_desc_dir, 'urdf', 'pioneer3dx.xacro')
 
-    # 0. 让 Gazebo 解析 package:// mesh（Gazebo classic 不认 package://）
+    # 0. 让 Gazebo 解析 package:// mesh + 本地模型库（含 willowgarage 等 model:// 引用）
     p3dx_desc_share = os.path.dirname(p3dx_desc_dir)  # .../install/p3dx_description_ros/share
+    _local_models = os.path.expanduser('~/.gazebo/models')
     _existing_model_path = os.environ.get('GAZEBO_MODEL_PATH', '')
-    gazebo_model_path = (
-        p3dx_desc_share + os.pathsep + _existing_model_path
-        if _existing_model_path else p3dx_desc_share
-    )
+    _model_paths = [p3dx_desc_share, _local_models]
+    if _existing_model_path:
+        _model_paths.append(_existing_model_path)
+    gazebo_model_path = os.pathsep.join(_model_paths)
     set_gazebo_model_path = SetEnvironmentVariable('GAZEBO_MODEL_PATH', gazebo_model_path)
 
     # 1. Gazebo（加载 world）
@@ -70,6 +75,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        declare_world,
         set_gazebo_model_path,
         gazebo,
         spawn_entity,
