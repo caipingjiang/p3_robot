@@ -93,7 +93,7 @@ class P3dxDriver:
     """
 
     def __init__(self, port: str, baud: int = 9600,
-                 max_v_mms: int = 500, max_w_degs: int = 60,
+                 max_v_mms: int = 800, max_w_degs: int = 60,
                  accel_mms2: int = 300, accel_degs2: int = 100):
         self.port = port
         self.baud = baud

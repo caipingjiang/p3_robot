@@ -36,7 +36,7 @@ class P3dxBaseNode(Node):
         self.declare_parameter("port", "/dev/p3dx")
         self.declare_parameter("baud", 9600)
         self.declare_parameter("enable_motors", True)
-        self.declare_parameter("max_v_mms", 500)      # 最大平移速度 mm/s
+        self.declare_parameter("max_v_mms", 800)      # 最大平移速度 mm/s（对应 turbo 0.8 m/s）
         self.declare_parameter("max_w_degs", 60)      # 最大旋转速度 deg/s
         self.declare_parameter("track_width_mm", 330.0)  # 轮距 mm（用于估算角速度）
         self.declare_parameter("odom_frame", "odom")
